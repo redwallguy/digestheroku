@@ -203,7 +203,7 @@ async def delSub(ctx, sub):
     if sub in subs_list:
         subs_list.remove(sub)
         r.lrem("meme_subs", sub)
-        await ctx.send("Subreddit removed".)
+        await ctx.send("Subreddit removed.")
         return True
     else:
         return False
