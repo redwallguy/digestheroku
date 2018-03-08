@@ -16,7 +16,7 @@ def postToImgur(urls):
     try:
         imgurclient = imgurpython.ImgurClient(client_id=imgur_cid,
                                               client_secret=imgur_csecret,
-                                              refesh_token=imgur_rtoken)
+                                              refresh_token=imgur_rtoken)
         title = "Meme Digest Vol. " + digest_vol
         album_info = imgurclient.create_album({"title": title})
         deletehash = album_info['deletehash']
@@ -43,7 +43,7 @@ def get_digest(vol_no = None):
     try:
         imgurclient = imgurpython.ImgurClient(client_id=imgur_cid,
                                               client_secret=imgur_csecret,
-                                              refesh_token=imgur_rtoken)
+                                              refresh_token=imgur_rtoken)
         if vol_no is None:
             all_albums = imgurclient.get_account_albums("me", page=0)
             for album in all_albums:

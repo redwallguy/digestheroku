@@ -10,14 +10,19 @@ discToken = os.environ.get('DISCORD_TOKEN')
 r = redis.from_url(os.environ.get("REDIS_URL"))
 
 ign_channels = [int(x) for x in r.lrange("ign_channels",0,-1)]
+print("hi")
 
 @client.event
 async def on_ready():
+    print("ready")
+    print(client.guilds)
     for guild in client.guilds:
+        print(guild.name)
         for tch in guild.text_channels:
+            print(tch.name)
             if tch.id not in ign_channels:
                 await tch.send("IT'S HIGH NOON'")
-                await channel.send(imgurpackage.get_digest())
+                await tch.send(imgurpackage.get_digest())
     keylist = r.keys("*/requests")
     reqMsg = ""
     for key in keylist:
@@ -29,6 +34,6 @@ async def on_ready():
         r.delete(key)
     if reqMsg != "":
         errormail.sendDevError("Requests", reqMsg)
+    await client.close()
 
-client.start(discToken)
-client.close()
+client.run(discToken)

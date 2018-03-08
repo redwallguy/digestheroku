@@ -19,7 +19,7 @@ red_pass = os.environ.get('REDDIT_PASSWORD')
 red_uname = os.environ.get('REDDIT_USERNAME')
 comm_chan_id = os.environ.get('COMMANDS_CHANNEL_ID')
 
-bot = commands.Bot(command_prefix='!!')
+bot = commands.Bot(command_prefix='!')
 r = redis.from_url(os.environ.get("REDIS_URL"))
 reddit = praw.Reddit(client_id=red_cid,
                      client_secret=red_csecret,
@@ -95,21 +95,22 @@ async def stopSpamming(ctx):
         
 @bot.event
 async def on_command(ctx):
-    if  ctx.author.id != bot.user.id:
-        if ctx.author.id not in spam_dict:
-            spam_dict[ctx.author.id] = 1
-        else:
-            spam_dict[ctx.author.id] += 1
-            if spam_dict[ctx.author.id] > 5:
-                spam_dict[ctx.author.id] = 5
+    if ctx.author.id not in spam_dict:
+        spam_dict[ctx.author.id] = 1
+    else:
+        spam_dict[ctx.author.id] += 1
+        if spam_dict[ctx.author.id] > 5:
+            spam_dict[ctx.author.id] = 5
 
 def flushTempBan():
     spam_dict = {}
+    print("Flushed")
 
-@bot.command()
-@commands.check(botChannel)
-async def resetSpam(ctx):
-    flushTempBan()
+@bot.event
+async def on_ready():
+    while True:
+        flushTempBan()
+        await asyncio.sleep(5)
 
 #-----------------------------------------------------------
 # Bot commands (Administrative)
@@ -159,6 +160,23 @@ async def unban(ctx,uid):
     else:
         return False
 
+@bot.command()
+async def getMods(ctx):
+    modmsg = "These are your current rulers of the Digest:\n"\
+             "-------------------------------------------\n"
+    for mod in mods:
+        modmem = await bot.get_user_info(mod)
+        modmsg += modmem.name + "\n"
+    await ctx.send(modmsg)
+
+@bot.command()
+async def getBannedOnes(ctx):
+    banmsg = "These are the exiles. Look upon them and weep.\n"\
+             "----------------------------------------------\n"
+    for banppl in banlist:
+        banmem = await bot.get_user_info(banppl)
+        banmsg += banmem.name + "\n"
+    await ctx.send(banmsg)
 #-----------------------------------------------------------
 # Bot commands (General)
 #-----------------------------------------------------------
