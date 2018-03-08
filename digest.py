@@ -20,7 +20,7 @@ red_uname = os.environ.get('REDDIT_USERNAME')
 comm_chan_id = os.environ.get('COMMANDS_CHANNEL_ID')
 
 bot = commands.Bot(command_prefix='!')
-r = redis.from_url(os.environ.get("REDIS_URL"))
+r = redis.from_url(os.environ.get("REDIS_URL"), decode_responses=True)
 reddit = praw.Reddit(client_id=red_cid,
                      client_secret=red_csecret,
                      password=red_pass,

@@ -9,7 +9,7 @@ imgur_cid = os.environ.get('IMGUR_CLIENT_ID')
 imgur_rtoken = os.environ.get('IMGUR_REFRESH_TOKEN')
 imgur_csecret = os.environ.get('IMGUR_CLIENT_SECRET')
 
-r = redis.from_url(os.environ.get("REDIS_URL"))
+r = redis.from_url(os.environ.get("REDIS_URL"), decode_responses=True)
 digest_vol = r.get("digest_vol")
 
 def postToImgur(urls):

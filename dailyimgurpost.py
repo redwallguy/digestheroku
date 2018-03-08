@@ -9,7 +9,7 @@ red_csecret = os.environ.get('REDDIT_CLIENT_SECRET')
 red_pass = os.environ.get('REDDIT_PASSWORD')
 red_uname = os.environ.get('REDDIT_USERNAME')
 
-r = redis.from_url(os.environ.get("REDIS_URL"))
+r = redis.from_url(os.environ.get("REDIS_URL"), decode_responses=True)
 subs_list = r.lrange("meme_subs",0,-1)
 print(subs_list)
 
