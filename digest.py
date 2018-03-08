@@ -78,7 +78,7 @@ def get_top_reddit(sub):
 # Spam prevention
 #-----------------------------------------------------------
 @bot.check
-aysnc def notBanned(ctx):
+async def notBanned(ctx):
     if ctx.author.id in banlist:
         return False
     else:
