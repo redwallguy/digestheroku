@@ -11,6 +11,7 @@ red_uname = os.environ.get('REDDIT_USERNAME')
 
 r = redis.from_url(os.environ.get("REDIS_URL"))
 subs_list = r.lrange("meme_subs",0,-1)
+print(subs_list)
 
 def get_top_reddit(subs_list):
     reddit = praw.Reddit(client_id=red_cid,
