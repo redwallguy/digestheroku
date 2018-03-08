@@ -167,7 +167,7 @@ async def unban(ctx,uid):
 async def gtr(ctx, *subs):
     mToSend = ""
     for sub in subs:
-        mToSend += sub + ': 'get_top_reddit(sub) + '\n'
+        mToSend += sub + ': ' + get_top_reddit(sub) + '\n'
     await ctx.send(mToSend)
 
 @bot.command()
