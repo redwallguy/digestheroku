@@ -225,6 +225,14 @@ async def delSub(ctx, sub):
         return True
     else:
         return False
+
+@bot.command()
+async def listSubs(ctx):
+    subs = getSubs()
+    submsg = "Subs in the digest are:\n"
+    for sub in subs:
+        submsg += sub + "\n"
+    await ctx.send(submsg)
 #-----------------------------------------------------------
 # Run bot
 #-----------------------------------------------------------

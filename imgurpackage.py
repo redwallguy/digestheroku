@@ -28,6 +28,7 @@ def postToImgur(urls):
                                             {"album":deletehash,
                                              "description":
                                              urls[key][1] + "\n-" +key})
+                print("Posted.")
             except:
                 pass
 

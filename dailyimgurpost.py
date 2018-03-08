@@ -34,4 +34,4 @@ def get_top_reddit(subs_list):
         print(postUrls[key])
     return postUrls
 
-imgurpackage.postToImgur(get_top_reddit(subs))
+imgurpackage.postToImgur(get_top_reddit(subs_list))
