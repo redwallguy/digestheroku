@@ -1,6 +1,7 @@
 import redis
 import os
 import errormail
+import json
 
 r = redis.from_url(os.environ.get("REDIS_URL"), decode_responses=True)
 
