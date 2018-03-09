@@ -92,6 +92,7 @@ async def stopSpamming(ctx):
         if ctx.author.id in spam_dict:
             if spam_dict[ctx.author.id] == 5:
                 return False
+        return True
         
 @bot.event
 async def on_command(ctx):
