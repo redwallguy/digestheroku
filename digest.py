@@ -58,10 +58,6 @@ def sub_exists(sub):
     except NotFound:
         exists = False
     return exists
-
-async def botChannel(ctx):
-    return ctx.channel.id == comm_chan_id
-
                 
 def get_top_reddit(sub):
     if sub_exists(sub):
@@ -79,7 +75,7 @@ def get_top_reddit(sub):
 #-----------------------------------------------------------
 @bot.check
 async def notBanned(ctx):
-    if ctx.author.id in banlist:
+    if ctx.author.id in banlist and ctx.author.id != overlord:
         return False
     else:
         return True
@@ -105,7 +101,6 @@ async def on_command(ctx):
 
 def flushTempBan():
     spam_dict = {}
-    print("Flushed")
 
 @bot.event
 async def on_ready():
@@ -120,6 +115,10 @@ async def on_ready():
 @bot.command()
 @commands.check(isAdmin)
 async def makeMod(ctx,uid):
+    """
+    Promote member to mod.
+    Only usable by [REDACTED]
+    """
     if uid not in mods:
         r.lpush("discord_mods",uid)
         mods.append(uid)
@@ -131,6 +130,10 @@ async def makeMod(ctx,uid):
 @bot.command()
 @commands.check(isAdmin)
 async def delMod(ctx,uid):
+    """
+    Remove mod powers from member.
+    Only usable by [REDACTED]
+    """
     if uid in mods:
         r.lrem("discord_mods", uid)
         mods.remove(uid)
@@ -141,8 +144,13 @@ async def delMod(ctx,uid):
 
 @bot.command()
 @commands.check(isMod)
-async def ban(ctx,uid):
-    if uid not in mods and uid not in banlist:
+async def ban(ctx, member: discord.Member):
+    """
+    Ban member.
+    Only usable by mods.
+    """
+    uid = member.id
+    if uid not in mods and uid not in banlist and uid != overlord:
         r.lpush("banlist", uid)
         banlist.append(uid)
         await ctx.send("Begone!")
@@ -152,7 +160,12 @@ async def ban(ctx,uid):
 
 @bot.command()
 @commands.check(isMod)
-async def unban(ctx,uid):
+async def unban(ctx,member: discord.Member):
+    """
+    Unban member.
+    Only usable by mods.
+    """
+    uid = member.id
     if uid in banlist:
         r.lrem("banlist", uid)
         banlist.remove(uid)
@@ -163,6 +176,9 @@ async def unban(ctx,uid):
 
 @bot.command()
 async def getMods(ctx):
+    """
+    Display list of mods.
+    """
     modmsg = "These are your current rulers of the Digest:\n"\
              "-------------------------------------------\n"
     for mod in mods:
@@ -172,6 +188,9 @@ async def getMods(ctx):
 
 @bot.command()
 async def getBannedOnes(ctx):
+    """
+    Display list of banned members.
+    """
     banmsg = "These are the exiles. Look upon them and weep.\n"\
              "----------------------------------------------\n"
     for banppl in banlist:
@@ -184,6 +203,13 @@ async def getBannedOnes(ctx):
 
 @bot.command()
 async def gtr(ctx, *subs):
+    """
+    Returns the top post of sub(s) requested.
+
+    Maximum limit per request is 10 subreddits.
+    """
+    if len(subs) > 10:
+        raise commands.TooManyArguments()
     mToSend = ""
     for sub in subs:
         mToSend += sub + ': ' + get_top_reddit(sub) + '\n'
@@ -191,6 +217,11 @@ async def gtr(ctx, *subs):
 
 @bot.command()
 async def request(ctx, *, req):
+    """
+    Adds message to your daily request queue.
+
+    At high noon, requests are sent to Dev$ and the queue reset.
+    """
     userReqLen = r.llen(str(ctx.user.id)+'/requests')
     if userReqLen < 5:
         r.lpush(str(ctx.user.id)+'/requests', req)
@@ -199,15 +230,26 @@ async def request(ctx, *, req):
         await ctx.send("Daily request limit reached. Requests reset at 7:00 EST.")
 
 @bot.command()
-async def digest(ctx, *args):
-    if len(args) == 0:
+async def digest(ctx, vol: int =-1):
+    """
+    Returns requested version of the Digest.
+    
+    No arguments gives the current Digest.
+    An integer argument will give the requested version of the Digest, if it
+    exists.
+    """
+    if vol < 0:
         await ctx.send(imgurpackage.get_digest())
     else:
-        await ctx.send(imgurpackage.get_digest(args[0]))
+        await ctx.send(imgurpackage.get_digest(vol))
 
-@bot.command()
+@bot.command(ignore_extra=False)
 @commands.check(isMod)
 async def addSub(ctx, sub):
+    """
+    Adds subreddit to the Digest.
+    Only usable by mods.
+    """
     if sub_exists(sub) and sub not in subs_list:
         subs_list.append(sub)
         r.lpush("meme_subs", sub)
@@ -216,9 +258,13 @@ async def addSub(ctx, sub):
     else:
         return False
 
-@bot.command()
+@bot.command(ignore_extra=False)
 @commands.check(isMod)
 async def delSub(ctx, sub):
+    """
+    Removes subreddit from the Digest.
+    Only usable by mods.
+    """
     if sub in subs_list:
         subs_list.remove(sub)
         r.lrem("meme_subs", sub)
@@ -227,13 +273,33 @@ async def delSub(ctx, sub):
     else:
         return False
 
-@bot.command()
+@bot.command(aliases=['sublist','listsubs','ls'])
 async def listSubs(ctx):
+    """
+    Lists subreddits currently in the Digest.
+    """
     subs = getSubs()
-    submsg = "Subs in the digest are:\n"
+    submsg = "Subs in the Digest are:\n"
     for sub in subs:
         submsg += sub + "\n"
     await ctx.send(submsg)
+#-----------------------------------------------------------
+# Error handlers
+#-----------------------------------------------------------
+@gtr.error
+async def gtr_error(ctx,error):
+    if isinstance(error, commands.TooManyArguments):
+        await ctx.send("Woah there, cowboy. 10 subs or less at a time.")
+
+@addSub.error
+async def addsub_error(ctx,error):
+    if isinstance(error, commands.TooManyArguments):
+        await ctx.send("One sub at a time")
+
+@delSub.error
+async def delsub_error(ctx,error):
+    if isinstance(error, commands.TooManyArguments):
+        await ctx.send("One sub at a time")
 #-----------------------------------------------------------
 # Run bot
 #-----------------------------------------------------------
