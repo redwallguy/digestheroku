@@ -114,11 +114,12 @@ async def on_ready():
 
 @bot.command()
 @commands.check(isAdmin)
-async def makeMod(ctx,uid):
+async def makeMod(ctx,member: discord.Member):
     """
     Promote member to mod.
     Only usable by [REDACTED]
     """
+    uid = member.id
     if uid not in mods:
         r.lpush("discord_mods",uid)
         mods.append(uid)
@@ -129,11 +130,12 @@ async def makeMod(ctx,uid):
 
 @bot.command()
 @commands.check(isAdmin)
-async def delMod(ctx,uid):
+async def delMod(ctx,member: discord.Member):
     """
     Remove mod powers from member.
     Only usable by [REDACTED]
     """
+    uid = member.id
     if uid in mods:
         r.lrem("discord_mods", uid)
         mods.remove(uid)
@@ -222,9 +224,9 @@ async def request(ctx, *, req):
 
     At high noon, requests are sent to Dev$ and the queue reset.
     """
-    userReqLen = r.llen(str(ctx.user.id)+'/requests')
+    userReqLen = r.llen(str(ctx.author)+'/requests')
     if userReqLen < 5:
-        r.lpush(str(ctx.user.id)+'/requests', req)
+        r.lpush(str(ctx.author)+'/requests', req)
         await ctx.send("Request acknowledged.")
     else:
         await ctx.send("Daily request limit reached. Requests reset at 7:00 EST.")
@@ -241,7 +243,7 @@ async def digest(ctx, vol: int =-1):
     if vol < 0:
         await ctx.send(imgurpackage.get_digest())
     else:
-        await ctx.send(imgurpackage.get_digest(vol))
+        await ctx.send(imgurpackage.get_digest(str(vol)))
 
 @bot.command(ignore_extra=False)
 @commands.check(isMod)
