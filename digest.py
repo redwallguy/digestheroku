@@ -100,7 +100,7 @@ async def on_command(ctx):
             spam_dict[ctx.author.id] = 5
 
 def flushTempBan():
-    spam_dict = {}
+    global spam_dict = {}
 
 @bot.event
 async def on_ready():
