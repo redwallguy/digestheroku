@@ -29,8 +29,8 @@ def postToImgur(urls):
                                              "description":
                                              urls[key][1] + "\n-" +key})
                 print("Posted.")
-            except:
-                pass
+            except Exception as e:
+                print(e)
 
         album_url = "imgur.com/a/" + album_id
         r.incr("digest_vol")

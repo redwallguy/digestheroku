@@ -26,7 +26,7 @@ def get_top_reddit(subs_list):
 
     postUrls = {}
 
-    for subreddit in subreddits:
+    for subreddit in subreddits: # If there is a new, non-stickied post in the top 5 of the sub, add
         for submission in subreddit.hot(limit=5):
             if submission.stickied == False and (datetime.datetime.now() - datetime.datetime.fromtimestamp(submission.created_utc)).total_seconds() < 86400:
                 postUrls[subreddit.display_name] = [submission.url,submission.title]
