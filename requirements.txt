@@ -39,7 +39,7 @@ python-dateutil==2.6.1
 pytz==2017.3
 redis==2.10.6
 requests==2.18.4
-rsa==3.4.2
+rsa==4.1
 six==1.11.0
 speedtest-cli==1.0.6
 stevedore==1.23.0
