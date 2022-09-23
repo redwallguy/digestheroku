@@ -24,7 +24,7 @@ pew==1.1.0
 pipenv==8.3.2
 praw==5.3.0
 prawcore==0.13.0
-protobuf==3.5.1
+protobuf==3.18.3
 pudb==2017.1.4
 pyasn1==0.4.2
 pyasn1-modules==0.2.1
